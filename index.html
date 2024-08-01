@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="lib/pangu.js"></script>
+    <title>兴顺矿业科技（徐州）有限公司</title>
+</head>
+
+<body>
+<div class="container">
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="brand">
+                <a href="index.html">
+                    <img src="resource/img/brand.jpg" alt="兴顺矿业科技">
+                </a>
+            </div>
+        </div>
+        <div class="nav-center">
+            <input type="checkbox" id="item-show" hidden>
+            <label for="item-show"></label>
+            <div class="items">
+                <a href="news.html" class="nav-item">案例分析</a>
+                <a href="campus.html" class="nav-item">公司简介</a>
+                <a href="educate.html" class="nav-item">新闻资讯</a>
+                <a href="research.html" class="nav-item">技术体系</a>
+                <a href="job.html" class="nav-item">招聘信息</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="input-btn">
+                <input type="text">
+                <button>
+                    🔍
+                </button>
+            </div>
+        </div>
+    </header>
+    <section class="content">
+        <div class="sliders" id="slider">
+            <div class="slider" v-for="s in imgs">
+                <img v-bind:src="'resource/img/slider/' + s.img" v-show="s.id === showId">
+            </div>
+            <div class="slider-prev" @click="showId = (showId - 1 + imgs.length) % imgs.length">&lt;</div>
+            <div class="slider-next" @click="showId = (showId + 1) % imgs.length">&gt;</div>
+        </div>
+        <div class="news" id="news">
+            <div class="card" v-for="news in content">
+                <a v-bind:href="'news.html?id=' + news.id">
+                    <img v-if="news.img != null" v-bind:src="'resource/img/news/' + news.id + '/' + news.img">
+                    <p class="summary">
+                        {{news.title}}
+                    </p>
+                    <p class="preview">
+                        {{news.preview}}
+                    </p>
+                </a>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <span class="info">江苏省徐州市高新技术产业开发区大学路99号大学创业园</span>
+        <span class="info">邮编 221200</span>
+        <span class="info">邮箱 heng320382@qq.com</span>
+    </footer>
+</div>
+<script type="module" src="js/slider.js"></script>
+<script type="module">
+    import {createApp} from "./lib/vue.esm-browser.js";
+
+    fetch('resource/articles.json')
+        .then(x => x.json())
+        .then(x => {
+            let contents = x.map(a => {
+                return {
+                    img: a.cover,
+                    id: a.id,
+                    title: a.title,
+                    preview: a.content.filter(c => c.type === 'text')[0].text
+                }
+            });
+
+            let news = {
+                data() {
+                    return {
+                        content: contents
+                    }
+                }
+            };
+
+            createApp(news).mount('#news');
+        });
+</script>
+</body>
+
+</html>

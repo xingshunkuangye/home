@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="lib/pangu.js"></script>
+    <title>兴顺矿业科技（徐州）有限公司</title>
+</head>
+
+
+<body>
+<div class="container">
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="brand">
+                <a href="index.html">
+                    <img src="resource/img/brand.jpg" alt="兴顺矿业科技">
+                </a>
+            </div>
+        </div>
+        <div class="nav-center">
+            <input type="checkbox" id="item-show" hidden>
+            <label for="item-show"></label>
+            <div class="items">
+                <a href="news.html" class="nav-item">新闻资讯</a>
+                <a href="campus.html" class="nav-item">公司简介</a>
+                <a href="educate.html" class="nav-item">案例分析</a>
+                <a href="research.html" class="nav-item">技术体系</a>
+                <a href="job.html" class="nav-item">招聘信息</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="input-btn">
+                <input type="text">
+                <button>
+                    🔍
+                </button>
+            </div>
+        </div>
+    </header>
+    <section class="content" id="content">
+        <div class="article" v-if="article">
+            <h1>{{content.title}}</h1>
+            <div class="article-info">
+                <p class="article-source">{{content.source}}</p>
+                <p class="article-date">{{content.date}}</p>
+            </div>
+            <template v-for="c in content.content">
+                <p v-if="c.type === 'text'">{{c.text}}</p>
+                <div v-else>
+                    <img :src="'resource/img/news/' + content.id + '/' + c.img" :alt="c.alt">
+                    <p class="img-desc">{{c.alt}}</p>
+                </div>
+            </template>
+        </div>
+        <div class="news" v-else>
+            <div class="card" v-for="news in content">
+                <a v-bind:href="'news.html?id=' + news.id">
+                    <img v-if="news.img != null" v-bind:src="'resource/img/news/' + news.id + '/' + news.img">
+                    <p class="summary">
+                        {{news.title}}
+                    </p>
+                    <p class="preview">
+                        {{news.preview}}
+                    </p>
+                </a>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <span class="info">浙江省杭州市下城区潮王路 18 号</span>
+        <span class="info">邮编 310014</span>
+        <span class="info">查台号 0571-88320114</span>
+    </footer>
+</div>
+<script type="module">
+    import {GetQueryString} from "./js/util.js";
+    import {createApp} from "./lib/vue.esm-browser.js";
+
+    fetch('resource/articles.json')
+        .then(x => x.json())
+        .then(x => {
+            let articles = x;
+            let newsId = GetQueryString('id');
+            let drawArticle = true;
+            let contents;
+
+            if (newsId === null) {
+                drawArticle = false;
+                contents = articles.map(a => {
+                    return {
+                        img: a.cover,
+                        id: a.id,
+                        title: a.title,
+                        preview: a.content.filter(c => c.type === 'text')[0].text
+                    }
+                });
+            } else {
+                contents = articles.filter(a => a.id === newsId)[0];
+            }
+
+            let news = {
+                data() {
+                    return {
+                        article: drawArticle,
+                        content: contents
+                    }
+                }
+            };
+
+            createApp(news).mount('#content');
+        });
+</script>
+</body>
+
+</html>
